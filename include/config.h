@@ -18,3 +18,6 @@
 #define MOTOR_ENCODER_Y_PIN_A  -1
 #define MOTOR_ENCODER_Y_PIN_B  -1
 
+#define SCL_PIN 26
+#define SDA_PIN 25
+

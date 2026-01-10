@@ -5,6 +5,8 @@
 #include "Joystick.h"
 #include "Pointer.h"
 #include "Game.h"
+#include "Wire.h"
+#include <Adafruit_SSD1306.h>
 
 #define ENC_PULSES_PER_REV 44.0
 #define GEARBOX_RATIO ((22.0/12.0)*(22.0/10.0)*(22.0/10.0)*(23.0/10.0))
@@ -16,6 +18,7 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_MATRIX_PIN, NEO_GRB + NEO_KHZ800);
 Joystick joystick(JOYSTICK_X_PIN, JOYSTICK_Y_PIN);
 Pointer pointer(&joystick, 16, 16);
 Game game;
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 IRAM_ATTR void motorXEncoder() {
     motorX.updatePosition();
@@ -30,6 +33,17 @@ void setMatrixLed(uint16_t x, uint16_t y, uint32_t color);
 void setup() {
     Serial.begin(115200);
     Serial.println("BITBot Starting...");
+    Wire.begin(SDA_PIN, SCL_PIN);
+    while (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+        Serial.println(F("SSD1306 allocation failed"));
+        delay(1000);
+    }
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(SSD1306_WHITE);
+    display.setCursor(0, 0);
+    display.println("BITBot Starting...");
+    display.display();
 
     joystick.begin();
     joystick.setMidPosition();
@@ -68,6 +82,10 @@ void setup() {
     Serial.println("Motors stopped");
     Serial.println("Setup complete");
 
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.display();
+
     game.start();
 }
 
@@ -99,6 +117,17 @@ void loop() {
             setMatrixLed(xLed, yLed, strip.Color(0, 50, 0));
             strip.show();
         }
+
+        display.clearDisplay();
+        display.setCursor(0, 0);
+        display.setTextSize(2);
+        if (game.isRunning()){
+            display.printf("Score: \n   %d\nTime:\n   %.1fs\n", (uint32_t)game.getScore(), game.getGameTimeLeft() / 1000.0f);
+        } else {
+            display.printf("Final Score:\n   %d\nMax Score:\n   %d\n", (uint32_t)game.getScore(), (uint32_t)game.getMaxScore());
+        }
+        display.display();
+
     }
 }
 

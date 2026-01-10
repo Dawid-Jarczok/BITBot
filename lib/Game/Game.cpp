@@ -44,4 +44,13 @@ void Game::start() {
 
 void Game::stop() {
     _isRunning = false;
+
+    if (_maxScore < _score) {
+        _maxScore = _score;
+    }
+}
+
+uint32_t Game::getGameTimeLeft() {
+    if (!_isRunning) return 0;
+    return _gameStartTime + _gameDuration - _gameTime;
 }
