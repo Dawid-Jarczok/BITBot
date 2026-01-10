@@ -7,11 +7,20 @@ void Game::begin() {
     _target->reset();
 }
 
+void Game::setLedPin(uint8_t pin) {
+    _ledPin = pin;
+    pinMode(_ledPin, OUTPUT);
+    digitalWrite(_ledPin, LOW);
+}
+
 void Game::iterate() {
     static uint32_t lastUpdate = 0;
     if (millis() - lastUpdate < _updateInterval) return;
     lastUpdate = millis();
-    if (!_isRunning) return;
+    if (!_isRunning) {
+        digitalWrite(_ledPin, LOW);
+        return;
+    }
     _gameTime = millis() - _gameStartTime;
 
     if (millis() - _lastGameSpeedUpTime >= _gameSpeedUpInterval) {
@@ -33,8 +42,10 @@ void Game::iterate() {
         _pointerY + _pointerRadius >= _targetY) {
         _score += (float)_gameTime * 0.01f * intervalSec;
         _isTargetInPointer = true;
+        digitalWrite(_ledPin, HIGH);
     } else {
         _isTargetInPointer = false;
+        digitalWrite(_ledPin, LOW);
     }
     
     if (_gameTime >= _gameDuration) {

@@ -9,6 +9,7 @@ public:
     Game(Target *target, Pointer *pointer) : _target(target), _pointer(pointer) {};
 
     void begin();
+    void setLedPin(uint8_t pin);
     void iterate();
     void updatePositions(float pointerX, float pointerY, float targetX, float targetY);
     void start();
@@ -37,11 +38,13 @@ private:
 
     uint16_t _updateInterval = 10;
 
+    uint8_t _ledPin = -1;
+
     float _targetX = 0.0f;
     float _targetY = 0.0f;
     float _pointerX = 0.0f;
     float _pointerY = 0.0f;
-    float _pointerRadius = 0.5f;
+    float _pointerRadius = 0.75f;
     bool _isTargetInPointer = false;
 
     Target *_target = nullptr;

@@ -57,7 +57,8 @@ void setup() {
     target.setUpdateInterval(10);
 
     game.begin();
-    game.setMode(2);
+    game.setLedPin(TARGET_LED_PIN);
+    game.setMode(0);
 
 
     while (!motorX.begin(ENC_PULSES_PER_REV, GEARBOX_RATIO)) {

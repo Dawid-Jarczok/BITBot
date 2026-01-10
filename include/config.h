@@ -21,3 +21,8 @@
 #define SCL_PIN 26
 #define SDA_PIN 25
 
+#define SCL1_PIN -1
+#define SDA1_PIN -1
+
+#define TARGET_LED_PIN 15
+
