@@ -5,10 +5,10 @@ void Pointer::begin() {
 
 void Pointer::iterate() {
     static uint32_t lastUpdate = 0;
-    if (millis() - lastUpdate < _updateInterfal) return;
+    if (millis() - lastUpdate < _updateInterval) return;
     lastUpdate = millis();
 
-    float intervalSec = (float)_updateInterfal / 1000.0f;
+    float intervalSec = (float)_updateInterval / 1000.0f;
     _xVel += _joystick->readX() * _acceleration * intervalSec;
     _yVel += _joystick->readY() * _acceleration * intervalSec;
     _xVel = constrain(_xVel, -_maxVelocity, _maxVelocity);

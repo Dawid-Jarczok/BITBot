@@ -10,7 +10,7 @@ public:
     void begin();
     inline void setMaxVelocity(float maxV) { _maxVelocity = maxV; }
     inline void setAcceleration(float acc) { _acceleration = acc; }
-    inline void setUpdateInterval(uint16_t intervalMs) { _updateInterfal = intervalMs; }
+    inline void setUpdateInterval(uint16_t intervalMs) { _updateInterval = intervalMs; }
     
     inline float getX() { return _x; }
     inline float getY() { return _y; }
@@ -24,7 +24,7 @@ private:
     const uint16_t _maxX;
     const uint16_t _maxY;
 
-    uint16_t _updateInterfal = 10;
+    uint16_t _updateInterval = 10;
 
     float _maxVelocity = 1.0f;
     float _acceleration = 0.5f;

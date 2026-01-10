@@ -4,6 +4,7 @@
 #include "config.h"
 #include "Joystick.h"
 #include "Pointer.h"
+#include "Game.h"
 
 #define ENC_PULSES_PER_REV 44.0
 #define GEARBOX_RATIO ((22.0/12.0)*(22.0/10.0)*(22.0/10.0)*(23.0/10.0))
@@ -14,6 +15,7 @@ Motor motorY(MOTOR_PIN_Y1, MOTOR_PIN_Y2, MOTOR_PIN_PWM_Y, MOTOR_ENCODER_Y_PIN_A,
 Adafruit_NeoPixel strip(LED_COUNT, LED_MATRIX_PIN, NEO_GRB + NEO_KHZ800);
 Joystick joystick(JOYSTICK_X_PIN, JOYSTICK_Y_PIN);
 Pointer pointer(&joystick, 16, 16);
+Game game;
 
 IRAM_ATTR void motorXEncoder() {
     motorX.updatePosition();
@@ -35,6 +37,8 @@ void setup() {
     pointer.begin();
     pointer.setMaxVelocity(2.0f);
     pointer.setAcceleration(0.5f);
+
+    game.begin();
 
 
     while (!motorX.begin(ENC_PULSES_PER_REV, GEARBOX_RATIO)) {
@@ -63,21 +67,27 @@ void setup() {
 
     Serial.println("Motors stopped");
     Serial.println("Setup complete");
+
+    game.start();
 }
 
 void loop() {
     motorX.iterate();
     pointer.iterate();
 
+    game.updatePositions(pointer.getX(), pointer.getY(), 0.0f, 0.0f);
+    game.iterate();
+
     static uint32_t lastPrint = 0;
     if (millis() - lastPrint > 100) {
         lastPrint = millis();
         //Serial.printf("Motor X: %.3f\tMotor Y: %.3f\n", motorX.getPositionRev(), motorY.getPositionRev());
 
-        Serial.printf("Pointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\n", 
+        Serial.printf("Pointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\t Game Score: %.2f\ttime: %dms\n", 
             pointer.getX(), pointer.getXVelocity(),
             pointer.getY(), pointer.getYVelocity(),
-            pointer.getXInt(), pointer.getYInt());
+            pointer.getXInt(), pointer.getYInt(),
+            game.getScore(), game.getGameTime());
 
         static uint16_t xLed = 1, yLed = 1;
         uint16_t xLed_new = pointer.getXInt();
