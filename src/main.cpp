@@ -8,6 +8,7 @@
 #include "Wire.h"
 #include <Adafruit_SSD1306.h>
 #include "Target.h"
+#include "UARTCommandParser.h"
 
 #define ENC_PULSES_PER_REV 44.0
 #define GEARBOX_RATIO ((22.0/12.0)*(22.0/10.0)*(22.0/10.0)*(23.0/10.0))
@@ -21,6 +22,7 @@ Pointer pointer(&joystick, 16, 16);
 Target target(16, 16);
 Game game(&target, &pointer);
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
+UARTCommandParser hmi(Serial);
 
 IRAM_ATTR void motorXEncoder() {
     motorX.updatePosition();
@@ -31,10 +33,20 @@ IRAM_ATTR void motorYEncoder() {
 }
 
 void setMatrixLed(uint16_t x, uint16_t y, uint32_t color);
+void sendHmiMsg(const char* msg, int32_t value);
+void sendHmiInit();
+void sendHmiUpdate();
+void setupHmiHandlers();
 
 void setup() {
     Serial.begin(115200);
     Serial.println("BITBot Starting...");
+
+    Serial1.setPins(RX_PIN, TX_PIN);
+    Serial1.begin(115200);
+    hmi.begin();
+    setupHmiHandlers();
+
     Wire.begin(SDA_PIN, SCL_PIN);
     while (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println(F("SSD1306 allocation failed"));
@@ -92,6 +104,8 @@ void setup() {
     display.setCursor(0, 0);
     display.display();
 
+    sendHmiInit();
+
     game.start();
 }
 
@@ -108,15 +122,17 @@ void loop() {
     static uint32_t lastPrint = 0;
     if (millis() - lastPrint > 100) {
         lastPrint = millis();
-        //Serial.printf("Motor X: %.3f\tMotor Y: %.3f\n", motorX.getPositionRev(), motorY.getPositionRev());
 
-        Serial.printf("dM X: %.2f\tPointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\t Game Score: %.2f\ttime: %dms\t%.2f %.2f\n", 
-            pointer.getX() - motorX.getPositionMM() / 1.3f,
-            pointer.getX(), pointer.getXVelocity(),
-            pointer.getY(), pointer.getYVelocity(),
-            pointer.getXInt(), pointer.getYInt(),
-            game.getScore(), game.getGameTime(),
-            target.getMaxVelocity(), target.getAcceleration());
+        hmi.iterate();
+        sendHmiUpdate();
+
+        // Serial.printf("dM X: %.2f\tPointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\t Game Score: %.2f\ttime: %dms\t%.2f %.2f\n", 
+        //     pointer.getX() - motorX.getPositionMM() / 1.3f,
+        //     pointer.getX(), pointer.getXVelocity(),
+        //     pointer.getY(), pointer.getYVelocity(),
+        //     pointer.getXInt(), pointer.getYInt(),
+        //     game.getScore(), game.getGameTime(),
+        //     target.getMaxVelocity(), target.getAcceleration());
 
         static uint16_t xLed = 1, yLed = 1;
         uint16_t xLed_new = pointer.getXInt();
@@ -162,4 +178,38 @@ void setMatrixLed(uint16_t x, uint16_t y, uint32_t color) {
     }
     index += x + (y * 8);
     strip.setPixelColor(index, color);
+}
+
+void sendHmiMsg(const char* msg, int32_t value) {
+    Serial1.printf("%s=%d\n", msg, value);
+}
+
+void sendHmiUpdate() {
+    sendHmiMsg("Score", (int32_t)game.getScore());
+    sendHmiMsg("", 1);
+}
+
+void sendHmiInit() {
+    sendHmiMsg("Difficulty", (int32_t)game.getMode());
+}
+
+void setupHmiHandlers() {
+    hmi.setDefaultHandler([](const char *cmd, const char *payload){
+        Serial.printf("Unknown/bad: [%s] -> [%s]\n", cmd ? cmd : "<null>", payload ? payload : "");
+    });
+    hmi.on("Hello", [](int32_t v) {
+        Serial.printf("Hello command received with value: %d\n", v);
+    });
+    hmi.on("StartGame", [](int32_t v) {
+        Serial.println("Starting game from HMI command");
+        game.start();
+    });
+    hmi.on("StopGame", [](int32_t v) {
+        Serial.println("Stopping game from HMI command");
+        game.stop();
+    });
+    hmi.on("SetDifficulty", [](int32_t v) {
+        Serial.printf("Setting game difficulty to %d from HMI command\n", v);
+        game.setMode((uint8_t)v);
+    });
 }

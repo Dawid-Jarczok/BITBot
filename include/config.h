@@ -8,9 +8,9 @@
 #define MOTOR_PIN_X1     19
 #define MOTOR_PIN_X2     18
 #define MOTOR_PIN_PWM_X  5
-#define MOTOR_PIN_Y1     -1
-#define MOTOR_PIN_Y2     -1
-#define MOTOR_PIN_PWM_Y  -1
+#define MOTOR_PIN_Y1     17
+#define MOTOR_PIN_Y2     16
+#define MOTOR_PIN_PWM_Y  4
 
 #define MOTOR_ENCODER_X_PIN_A  22
 #define MOTOR_ENCODER_X_PIN_B  23
@@ -21,8 +21,7 @@
 #define SCL_PIN 26
 #define SDA_PIN 25
 
-#define SCL1_PIN -1
-#define SDA1_PIN -1
-
 #define TARGET_LED_PIN 15
 
+#define TX_PIN 14
+#define RX_PIN 27
