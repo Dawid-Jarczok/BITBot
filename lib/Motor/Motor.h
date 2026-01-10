@@ -12,6 +12,7 @@ public:
     void stop();
     inline int32_t getPosition() { return _encPos; }
     float getPositionRev();
+    float getPositionMM();
 
     inline void setPID(bool enable) { _pidEnabled = enable; }
     inline void setSetpoint(float sp) { setpoint = sp; }

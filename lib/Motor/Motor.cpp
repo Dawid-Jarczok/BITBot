@@ -55,6 +55,12 @@ float Motor::getPositionRev() {
     return _posRev;
 }
 
+float Motor::getPositionMM() {
+    float posRev = getPositionRev();
+    float posRack = posRev * PI;
+    return posRack;
+}
+
 void Motor::updatePosition() {
     static const int8_t encoderTable[16] = {
         0, -1, +1, 0,
@@ -74,7 +80,7 @@ void Motor::iterate() {
     if (millis() - lastTime < 10) return;
     lastTime = millis();
     if (_pidEnabled) {
-        input = getPositionRev();
+        input = getPositionMM();
         if (abs(setpoint - input) < 0.001f) {
             stop();
             output = 0.0f;

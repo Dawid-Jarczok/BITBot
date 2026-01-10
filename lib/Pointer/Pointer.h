@@ -18,6 +18,8 @@ public:
     inline uint16_t getYInt() { return (uint16_t)_y; }
     inline float getXVelocity() { return _xVel; }
     inline float getYVelocity() { return _yVel; }
+    inline float getMaxVelocity() { return _maxVelocity; }
+    inline float getAcceleration() { return _acceleration; }
     void iterate();
 
 private:
