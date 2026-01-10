@@ -1,7 +1,7 @@
 #pragma once 
 
-#define JOYSTICK_X_PIN  -1
-#define JOYSTICK_Y_PIN  -1
+#define JOYSTICK_X_PIN  13
+#define JOYSTICK_Y_PIN  12
 
 #define LED_MATRIX_PIN  21
 
