@@ -1,15 +1,19 @@
 #include "Target.h"
 
 void Target::begin() {
-    uint8_t spawnX, spawnY;
-    spawningPoint(spawnX, spawnY);
-    _x = (float)spawnX;
-    _y = (float)spawnY;
+    reset();
+}
+
+void Target::reset() {
+    _x = _maxX / 2.0f;
+    _y = _maxY / 2.0f;
 
     spawnNewTarget();
+    isRunning = false;
 }
 
 void Target::iterate() {
+    if (!isRunning) return;
     static uint32_t lastUpdate = 0;
     if (millis() - lastUpdate < _updateInterfal) return;
     lastUpdate = millis();

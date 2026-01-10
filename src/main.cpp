@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "Wire.h"
 #include <Adafruit_SSD1306.h>
+#include "Target.h"
 
 #define ENC_PULSES_PER_REV 44.0
 #define GEARBOX_RATIO ((22.0/12.0)*(22.0/10.0)*(22.0/10.0)*(23.0/10.0))
@@ -17,7 +18,8 @@ Motor motorY(MOTOR_PIN_Y1, MOTOR_PIN_Y2, MOTOR_PIN_PWM_Y, MOTOR_ENCODER_Y_PIN_A,
 Adafruit_NeoPixel strip(LED_COUNT, LED_MATRIX_PIN, NEO_GRB + NEO_KHZ800);
 Joystick joystick(JOYSTICK_X_PIN, JOYSTICK_Y_PIN);
 Pointer pointer(&joystick, 16, 16);
-Game game;
+Target target(16, 16);
+Game game(&target, &pointer);
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 IRAM_ATTR void motorXEncoder() {
@@ -49,10 +51,13 @@ void setup() {
     joystick.setMidPosition();
 
     pointer.begin();
-    pointer.setMaxVelocity(2.0f);
-    pointer.setAcceleration(0.5f);
+    pointer.setUpdateInterval(10);
+
+    target.begin();
+    target.setUpdateInterval(10);
 
     game.begin();
+    game.setMode(2);
 
 
     while (!motorX.begin(ENC_PULSES_PER_REV, GEARBOX_RATIO)) {
@@ -92,20 +97,25 @@ void setup() {
 void loop() {
     motorX.iterate();
     pointer.iterate();
+    target.iterate();
 
-    game.updatePositions(pointer.getX(), pointer.getY(), 0.0f, 0.0f);
+    game.updatePositions(pointer.getX(), pointer.getY(), target.getX(), target.getY());
     game.iterate();
+
+    motorX.setSetpoint(pointer.getX() * 1.3f);
 
     static uint32_t lastPrint = 0;
     if (millis() - lastPrint > 100) {
         lastPrint = millis();
         //Serial.printf("Motor X: %.3f\tMotor Y: %.3f\n", motorX.getPositionRev(), motorY.getPositionRev());
 
-        Serial.printf("Pointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\t Game Score: %.2f\ttime: %dms\n", 
+        Serial.printf("dM X: %.2f\tPointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\t Game Score: %.2f\ttime: %dms\t%.2f %.2f\n", 
+            pointer.getX() - motorX.getPositionMM() / 1.3f,
             pointer.getX(), pointer.getXVelocity(),
             pointer.getY(), pointer.getYVelocity(),
             pointer.getXInt(), pointer.getYInt(),
-            game.getScore(), game.getGameTime());
+            game.getScore(), game.getGameTime(),
+            target.getMaxVelocity(), target.getAcceleration());
 
         static uint16_t xLed = 1, yLed = 1;
         uint16_t xLed_new = pointer.getXInt();
@@ -115,6 +125,17 @@ void loop() {
             xLed = xLed_new;
             yLed = yLed_new;
             setMatrixLed(xLed, yLed, strip.Color(0, 50, 0));
+            strip.show();
+        }
+
+        static uint16_t xTarget = 1, yTarget = 1;
+        uint16_t xTarget_new = target.getXInt();
+        uint16_t yTarget_new = target.getYInt();
+        if (xTarget != xTarget_new || yTarget != yTarget_new) {
+            setMatrixLed(xTarget, yTarget, strip.Color(0, 0, 0));
+            xTarget = xTarget_new;
+            yTarget = yTarget_new;
+            setMatrixLed(xTarget, yTarget, strip.Color(50, 0, 0));
             strip.show();
         }
 

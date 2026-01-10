@@ -9,6 +9,10 @@ public:
 
     void begin();
 
+    void reset();
+    void start() { isRunning = true; }
+    void stop() { isRunning = false; }
+
     inline void setMaxVelocity(float maxV) { _maxVelocity = maxV; }
     inline void setAcceleration(float acc) { _acceleration = acc; }
     inline void setUpdateInterval(uint16_t intervalMs) { _updateInterfal = intervalMs; }
@@ -21,6 +25,8 @@ public:
     inline uint16_t getYInt() { return (uint16_t)_y; }
     inline float getXVelocity() { return _xVel; }
     inline float getYVelocity() { return _yVel; }
+    inline float getMaxVelocity() { return _maxVelocity; }
+    inline float getAcceleration() { return _acceleration; }
     void iterate();
 
 private:
@@ -28,6 +34,7 @@ private:
     const uint16_t _maxY;
 
     uint16_t _updateInterfal = 10;
+    bool isRunning = false;
 
     float _maxVelocity = 1.0f;
     float _acceleration = 0.5f;

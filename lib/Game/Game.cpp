@@ -3,6 +3,8 @@
 void Game::begin() {
     _score = 0.0f;
     _isRunning = false;
+
+    _target->reset();
 }
 
 void Game::iterate() {
@@ -11,6 +13,18 @@ void Game::iterate() {
     lastUpdate = millis();
     if (!_isRunning) return;
     _gameTime = millis() - _gameStartTime;
+
+    if (millis() - _lastGameSpeedUpTime >= _gameSpeedUpInterval) {
+        _lastGameSpeedUpTime = millis();
+        
+        float newTargetMaxV = _target->getMaxVelocity() + _TargetVelocityUp;
+        newTargetMaxV = constrain(newTargetMaxV, _modeTargetMinVelocity[_mode], _modeTargetMaxVelocity[_mode]);
+        _target->setMaxVelocity(newTargetMaxV);
+
+        float newTargetAcc = _target->getAcceleration() + _TargetAccelerationUp;
+        newTargetAcc = constrain(newTargetAcc, _modeTargetMinAcceleration[_mode], _modeTargetMaxAcceleration[_mode]);
+        _target->setAcceleration(newTargetAcc);
+    }
 
     float intervalSec = (float)_updateInterval / 1000.0f;
     if (_pointerX - _pointerRadius <= _targetX &&
@@ -40,9 +54,18 @@ void Game::start() {
     _score = 0;
     _gameStartTime = millis();
     _gameTime = 0;
+    _lastGameSpeedUpTime = _gameStartTime;
+    _calculateGameSpeedUp();
+    _pointer->setMaxVelocity(_modePointerMaxVelocity[_mode]);
+    _pointer->setAcceleration(_modePointerAcceleration[_mode]);
+    _target->reset();
+    _target->setMaxVelocity(_modeTargetMinVelocity[_mode]);
+    _target->setAcceleration(_modeTargetMinAcceleration[_mode]);
+    _target->start();
 }
 
 void Game::stop() {
+    _target->stop();
     _isRunning = false;
 
     if (_maxScore < _score) {
@@ -53,4 +76,17 @@ void Game::stop() {
 uint32_t Game::getGameTimeLeft() {
     if (!_isRunning) return 0;
     return _gameStartTime + _gameDuration - _gameTime;
+}
+
+void Game::setMode(uint8_t mode) {
+    if (mode > 2) mode = 2;
+    _mode = mode;
+}
+
+void Game::_calculateGameSpeedUp() {
+    float targetVelDiff = _modeTargetMaxVelocity[_mode] - _modeTargetMinVelocity[_mode];
+    float targetAccDiff = _modeTargetMaxAcceleration[_mode] - _modeTargetMinAcceleration[_mode];
+    _gameSpeedUpInterval = _gameDuration / _gameSpeedUpItervals;
+    _TargetVelocityUp = targetVelDiff / (float)_gameSpeedUpItervals;
+    _TargetAccelerationUp = targetAccDiff / (float)_gameSpeedUpItervals;
 }
