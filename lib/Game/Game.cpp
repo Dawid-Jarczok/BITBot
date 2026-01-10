@@ -90,6 +90,7 @@ uint32_t Game::getGameTimeLeft() {
 }
 
 void Game::setMode(uint8_t mode) {
+    if (_isRunning) return;
     if (mode > 2) mode = 2;
     _mode = mode;
 }

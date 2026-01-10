@@ -27,6 +27,7 @@ public:
     uint32_t getGameTimeLeft();
 
     void setMode(uint8_t mode);
+    inline uint8_t getMode() { return _mode; }
 
 private:
     bool _isRunning = false;
