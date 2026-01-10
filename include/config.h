@@ -3,10 +3,10 @@
 #define JOYSTICK_X_PIN  -1
 #define JOYSTICK_Y_PIN  -1
 
-#define LED_MATRIX_PIN  -1
+#define LED_MATRIX_PIN  21
 
-#define MOTOR_PIN_X1     18
-#define MOTOR_PIN_X2     19
+#define MOTOR_PIN_X1     19
+#define MOTOR_PIN_X2     18
 #define MOTOR_PIN_PWM_X  5
 #define MOTOR_PIN_Y1     -1
 #define MOTOR_PIN_Y2     -1

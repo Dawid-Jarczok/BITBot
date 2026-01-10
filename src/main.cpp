@@ -1,13 +1,16 @@
 #include <Arduino.h>
+#include <Adafruit_NeoPixel.h>
 #include <Motor.h>
 #include "config.h"
 
 #define ENC_PULSES_PER_REV 44.0
 #define GEARBOX_RATIO ((22.0/12.0)*(22.0/10.0)*(22.0/10.0)*(23.0/10.0))
-#define MOTOR_PWM_START 70
+#define LED_COUNT 64*4
 
 Motor motorX(MOTOR_PIN_X1, MOTOR_PIN_X2, MOTOR_PIN_PWM_X, MOTOR_ENCODER_X_PIN_A, MOTOR_ENCODER_X_PIN_B);
 Motor motorY(MOTOR_PIN_Y1, MOTOR_PIN_Y2, MOTOR_PIN_PWM_Y, MOTOR_ENCODER_Y_PIN_A, MOTOR_ENCODER_Y_PIN_B);
+Adafruit_NeoPixel strip(LED_COUNT, LED_MATRIX_PIN, NEO_GRB + NEO_KHZ800);
+
 
 IRAM_ATTR void motorXEncoder() {
     motorX.updatePosition();
@@ -17,18 +20,24 @@ IRAM_ATTR void motorYEncoder() {
     motorY.updatePosition();
 }
 
+void setMatrixLed(uint16_t x, uint16_t y, uint32_t color);
+
 void setup() {
     Serial.begin(115200);
     Serial.println("BITBot Starting...");
-
-    // pinMode(JOYSTICK_X_PIN, INPUT);
-    // pinMode(JOYSTICK_Y_PIN, INPUT);
 
     while (!motorX.begin(ENC_PULSES_PER_REV, GEARBOX_RATIO)) {
         Serial.println("Motor X initialization failed!");
         delay(1000);
     }
-    // motorY.begin(ENC_PULSES_PER_REV, GEARBOX_RATIO);
+    // while (!motorY.begin(ENC_PULSES_PER_REV, GEARBOX_RATIO)) {
+    //     Serial.println("Motor Y initialization failed!");
+    //     delay(1000);
+    // }
+
+    strip.begin();
+    strip.show();
+    strip.setBrightness(10);
 
     attachInterrupt(MOTOR_ENCODER_X_PIN_A, motorXEncoder, CHANGE);
     attachInterrupt(MOTOR_ENCODER_X_PIN_B, motorXEncoder, CHANGE);
@@ -36,16 +45,34 @@ void setup() {
     // attachInterrupt(MOTOR_ENCODER_Y_PIN_B, motorYEncoder, CHANGE);
 
     Serial.println("Starting motors");
-    motorX.setSpeed(255);
-    //delay(2000);
-    //motorX.setSpeed(-255);
-    delay(2000);
-    motorX.stop();
+    motorX.setPID(true);
+    motorX.setSetpoint(0.0);
+    // motorY.setPID(true);
+    // motorY.setSetpoint(0.0);
+
     Serial.println("Motors stopped");
+    Serial.println("Setup complete");
 }
 
 void loop() {
-    Serial.println("Hello, BITBot!");
-    delay(1000);
-    Serial.printf("Motor X: %f\tMotor Y: %f\n", motorX.getPositionRev(), motorY.getPositionRev());
+    motorX.iterate();
+
+    static uint32_t lastPrint = 0;
+    if (millis() - lastPrint > 100) {
+        lastPrint = millis();
+        Serial.printf("Motor X: %f\tMotor Y: %f\n", motorX.getPositionRev(), motorY.getPositionRev());
+    }
+
+    delay(100);
+}
+
+void setMatrixLed(uint16_t x, uint16_t y, uint32_t color) {
+    if (x > 15 || y > 15) return;
+    uint16_t index = 0;
+    if (x >= 8) {
+        x -= 8;
+        index += 128;
+    }
+    index += x + (y * 8);
+    strip.setPixelColor(index, color);
 }
