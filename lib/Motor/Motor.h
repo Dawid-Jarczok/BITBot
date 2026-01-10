@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <Arduino.h>
-//#include <QuidkPID.h>
+#include <QuickPID.h>
 
 class Motor {
 public:
@@ -13,7 +13,11 @@ public:
     inline int32_t getPosition() { return _encPos; }
     float getPositionRev();
 
+    inline void setPID(bool enable) { _pidEnabled = enable; }
+    inline void setSetpoint(float sp) { setpoint = sp; }
+
     IRAM_ATTR void updatePosition();
+    void iterate();
 
 private:
     uint8_t _pin1;
@@ -31,12 +35,14 @@ private:
     volatile int32_t _encPos = 0;
     volatile uint8_t _encLastState = 0b00;
 
-    
+    float _enc_err_thr = 0.0;
     float Kp = 500.0f;
     float Ki = 0.0f;
-    float Kd = 15.0f;
+    float Kd = 0.0f;
+    float input = 0.0f, output = 0.0f, setpoint = 0.0f;
+    bool _pidEnabled = false;
 
-    // QuickPID pid(&input, &output, &setpoint, Kp, Ki, Kd,
-    //             QuickPID::pMode::pOnError, QuickPID::dMode::dOnMeas, QuickPID::iAwMode::iAwCondition,
-    //             QuickPID::Action::direct);
+    QuickPID pid = QuickPID(&input, &output, &setpoint, Kp, Ki, Kd,
+                QuickPID::pMode::pOnError, QuickPID::dMode::dOnMeas, QuickPID::iAwMode::iAwCondition,
+                QuickPID::Action::direct);
 };
