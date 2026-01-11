@@ -40,7 +40,7 @@ void Game::iterate() {
         _pointerX + _pointerRadius >= _targetX &&
         _pointerY - _pointerRadius <= _targetY &&
         _pointerY + _pointerRadius >= _targetY) {
-        _score += (float)_gameTime * 0.01f * intervalSec * (1.0f + (float)_mode);
+        _score += (float)_gameTime * 0.01f * intervalSec * pow(1.0f + (float)_mode, 2);
         _isTargetInPointer = true;
         digitalWrite(_ledPin, HIGH);
     } else {
@@ -81,6 +81,11 @@ void Game::stop() {
 
     if (_maxScore < _score) {
         _maxScore = _score;
+        if (_prefs) {
+            _prefs->begin("settings", false);
+            _prefs->putFloat("maxScore", _maxScore);
+            _prefs->end();
+        }
     }
 }
 
@@ -91,7 +96,7 @@ uint32_t Game::getGameTimeLeft() {
 
 void Game::setMode(uint8_t mode) {
     if (_isRunning) return;
-    if (mode > 2) mode = 2;
+    if (mode >= maxModes) mode = maxModes - 1;
     _mode = mode;
 }
 

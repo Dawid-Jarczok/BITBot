@@ -16,6 +16,7 @@ public:
 
     inline void setPID(bool enable) { _pidEnabled = enable; }
     inline void setSetpoint(float sp) { setpoint = sp; }
+    inline void setMaxSpeed(float maxSpeed) { _maxSpeed = maxSpeed; }
 
     IRAM_ATTR void updatePosition();
     void iterate();
@@ -30,6 +31,7 @@ private:
     float _gearboxRatio;
 
     int16_t _speed = 0;
+    float _maxSpeed = 1.0f;
 
     float _posRev = 0.0;
 

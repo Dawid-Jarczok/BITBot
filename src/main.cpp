@@ -9,18 +9,20 @@
 #include <Adafruit_SSD1306.h>
 #include "Target.h"
 #include "UARTCommandParser.h"
+#include <Preferences.h>
 
 #define ENC_PULSES_PER_REV 44.0
 #define GEARBOX_RATIO ((22.0/12.0)*(22.0/10.0)*(22.0/10.0)*(23.0/10.0))
 #define LED_COUNT 64*4
 
+Preferences prefs;
 Motor motorX(MOTOR_PIN_X1, MOTOR_PIN_X2, MOTOR_PIN_PWM_X, MOTOR_ENCODER_X_PIN_A, MOTOR_ENCODER_X_PIN_B);
 Motor motorY(MOTOR_PIN_Y1, MOTOR_PIN_Y2, MOTOR_PIN_PWM_Y, MOTOR_ENCODER_Y_PIN_A, MOTOR_ENCODER_Y_PIN_B);
 Adafruit_NeoPixel strip(LED_COUNT, LED_MATRIX_PIN, NEO_GRB + NEO_KHZ800);
 Joystick joystick(JOYSTICK_X_PIN, JOYSTICK_Y_PIN);
 Pointer pointer(&joystick, 16, 16);
 Target target(16, 16);
-Game game(&target, &pointer);
+Game game(&target, &pointer, &prefs);
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 UARTCommandParser hmi(Serial1);
 
@@ -41,6 +43,16 @@ void setupHmiHandlers();
 void setup() {
     Serial.begin(115200);
     Serial.println("BITBot Starting...");
+
+    prefs.begin("settings", false);
+    if (!prefs.isKey("nvsInit")) {
+        prefs.putBool("nvsInit", true);
+        prefs.putLong("maxScore", 0);
+    }
+    float maxScore = prefs.getFloat("maxScore", 0.0f);
+    prefs.end();
+    game.setMaxScore(maxScore);
+    Serial.printf("Max Score loaded: %.2f\n", maxScore);
 
     Serial1.setPins(RX_PIN, TX_PIN);
     Serial1.begin(115200);
@@ -70,7 +82,7 @@ void setup() {
 
     game.begin();
     game.setLedPin(TARGET_LED_PIN);
-    game.setMode(2);
+    game.setMode(0);
 
 
     while (!motorX.begin(ENC_PULSES_PER_REV, GEARBOX_RATIO)) {
@@ -91,22 +103,16 @@ void setup() {
     attachInterrupt(MOTOR_ENCODER_Y_PIN_A, motorYEncoder, CHANGE);
     attachInterrupt(MOTOR_ENCODER_Y_PIN_B, motorYEncoder, CHANGE);
 
-    Serial.println("Starting motors");
     motorX.setPID(true);
     motorX.setSetpoint(0.0);
     motorY.setPID(true);
     motorY.setSetpoint(0.0);
-
-    Serial.println("Motors stopped");
-    Serial.println("Setup complete");
 
     display.clearDisplay();
     display.setCursor(0, 0);
     display.display();
 
     sendHmiInit();
-
-    game.start();
 }
 
 void loop() {
@@ -122,6 +128,8 @@ void loop() {
         motorX.setSetpoint(pointer.getX() * 8.0f);
         motorY.setSetpoint(pointer.getY() * 8.0f);
     } else {
+        motorX.setMaxSpeed(0.5f);
+        motorY.setMaxSpeed(0.5f);
         motorX.setSetpoint(0.0f);
         motorY.setSetpoint(0.0f);
         pointer.resetPosition();
@@ -180,10 +188,12 @@ void sendHmiMsg(const char* msg, int32_t value) {
 
 void sendHmiUpdate() {
     sendHmiMsg("Score", (int32_t)game.getScore());
-    Serial.printf("Score sent: %d\n", (int32_t)game.getScore());
+    sendHmiMsg("MaxScore", (int32_t)game.getMaxScore());
+    sendHmiMsg("GameRunning", (int32_t)game.isRunning());
 }
 
 void sendHmiInit() {
+    sendHmiMsg("Hello", 5);
     sendHmiMsg("Difficulty", (int32_t)game.getMode());
 }
 
@@ -197,6 +207,8 @@ void setupHmiHandlers() {
     hmi.on("StartGame", [](int32_t v) {
         Serial.println("Starting game from HMI command");
         game.start();
+        motorX.setMaxSpeed(1.0f);
+        motorY.setMaxSpeed(1.0f);
     });
     hmi.on("StopGame", [](int32_t v) {
         Serial.println("Stopping game from HMI command");
