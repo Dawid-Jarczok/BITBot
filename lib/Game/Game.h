@@ -3,10 +3,11 @@
 #include <Arduino.h>
 #include "Target.h"
 #include "Pointer.h"
+#include <Preferences.h>
 
 class Game {
 public:
-    Game(Target *target, Pointer *pointer) : _target(target), _pointer(pointer) {};
+    Game(Target *target, Pointer *pointer, Preferences *prefs) : _target(target), _pointer(pointer), _prefs(prefs) {};
 
     void begin();
     void setLedPin(uint8_t pin);
@@ -18,12 +19,13 @@ public:
     void setPointerRadius(float radius) { _pointerX = radius; }
     void setUpdateInterval(uint16_t intervalMs) { _updateInterval = intervalMs; }
     void setGameDuration(uint32_t durationMs) { _gameDuration = durationMs; }
+    inline void setMaxScore(float maxScore) { _maxScore = maxScore; }
 
     inline float getScore() { return _score; }
     inline float getMaxScore() { return _maxScore; }
     inline uint32_t getGameTime() { return _gameTime; }
     inline bool isTargetInPointer() { return _isTargetInPointer; }
-    bool isRunning() { return _isRunning; }
+    inline bool isRunning() { return _isRunning; }
     uint32_t getGameTimeLeft();
 
     void setMode(uint8_t mode);
@@ -50,15 +52,17 @@ private:
 
     Target *_target = nullptr;
     Pointer *_pointer = nullptr;
+    Preferences *_prefs = nullptr;
 
     uint8_t _mode = 0;
-    const float _modeTargetMinVelocity[3] = {0.5f, 1.5f, 3.0f};
-    const float _modeTargetMaxVelocity[3] = {1.0f, 4.0f, 9.0f};
-    const float _modeTargetMinAcceleration[3] = {1.0f, 1.5f, 2.0f};
-    const float _modeTargetMaxAcceleration[3] = {1.5f, 3.0f, 6.0f};
+    const uint8_t maxModes = 5;
+    const float _modeTargetMinVelocity[5] = {0.5f, 1.5f, 3.0f, 5.5f, 12.0f};
+    const float _modeTargetMaxVelocity[5] = {1.0f, 4.0f, 9.0f, 12.0f, 18.0f};
+    const float _modeTargetMinAcceleration[5] = {1.0f, 1.5f, 2.0f, 4.0f, 10.0f};
+    const float _modeTargetMaxAcceleration[5] = {1.5f, 3.0f, 6.0f, 9.0f, 15.0f};
 
-    const float _modePointerMaxVelocity[3] = {2.0f, 5.0f, 10.0f};
-    const float _modePointerAcceleration[3] = {2.0f, 5.0f, 8.0f};
+    const float _modePointerMaxVelocity[5] = {2.0f, 5.0f, 10.0f, 15.0f, 20.0f};
+    const float _modePointerAcceleration[5] = {2.0f, 5.0f, 8.0f, 10.0f, 15.0f};
 
     float _TargetVelocityUp = 0.1f;
     float _TargetAccelerationUp = 0.1f;

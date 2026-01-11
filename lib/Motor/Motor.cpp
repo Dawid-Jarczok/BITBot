@@ -8,8 +8,6 @@ bool Motor::begin(float encoderPulsesPerRev, float gearboxRatio) {
     _encoderPulsesPerRev = encoderPulsesPerRev;
     _gearboxRatio = gearboxRatio;
 
-    _enc_err_thr = (2.0 / _encoderPulsesPerRev) / _gearboxRatio;
-
     pinMode(_pin1, OUTPUT);
     pinMode(_pin2, OUTPUT);
     pinMode(_pwmPin, OUTPUT);
@@ -27,6 +25,7 @@ bool Motor::begin(float encoderPulsesPerRev, float gearboxRatio) {
 }
 
 void Motor::setSpeed(int16_t speed) {
+    speed = (int16_t)((float)speed * _maxSpeed);
     constrain(speed, -255, 255);
     _speed = speed;
     if (speed > 0) {
