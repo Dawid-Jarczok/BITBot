@@ -6,15 +6,6 @@
 #include "config.h" 
 #include "UARTCommandParser.h"
 
-// --- KONFIGURACJA PRZYCISKÓW ---
-#define PIN_UP  5   
-#define PIN_DOWN 18
-#define PIN_OK    19  
-#define PIN_BACK  21  
-
-#define PILOT_RX_PIN 16 
-#define PILOT_TX_PIN 17
-
 // --- EKRAN ---
 Adafruit_SSD1306 display(128, 64, &Wire1, -1);
 UARTCommandParser hmi(Serial1);

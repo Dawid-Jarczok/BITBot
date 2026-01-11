@@ -21,3 +21,12 @@
 #define SCL_PIN 26
 #define SDA_PIN 25
 
+#define PIN_UP  5   
+#define PIN_DOWN 18
+#define PIN_OK    19  
+#define PIN_BACK  21  
+
+#define PILOT_RX_PIN 16 
+#define PILOT_TX_PIN 17
+
+
