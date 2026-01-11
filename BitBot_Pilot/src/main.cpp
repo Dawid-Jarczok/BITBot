@@ -105,7 +105,6 @@ void loop() {
     // 1. Odbieranie danych z Robota (non-stop)
     hmi.iterate();
 
-    // 2. Obsługa przycisków (zawsze!)
     btnUP.tick();
     btnDown.tick();
     btnOk.tick();
@@ -116,8 +115,6 @@ void loop() {
     if (millis() - lastDraw > 50) { // 20 FPS
         lastDraw = millis();
         display.clearDisplay();
-
-        hmi.iterate();
 
         switch (currentState) {
             case MENU:
@@ -185,7 +182,22 @@ void drawGame() {
 
     display.setCursor(10, 35);
     display.print("Poziom: ");
-    display.print(robotDifficulty);
+        switch (robotDifficulty)
+    {
+    case 0:
+        display.print("LATWY");
+        break;
+    case 1:
+        display.print("SREDNI");
+        break;
+    case 2:
+        display.print("TRUDNY");
+        break;  
+    default:
+        display.print(robotDifficulty);
+        break;
+    }
+
     
     display.drawLine(0, 48, 128, 48, SSD1306_WHITE);
     display.setCursor(0, 54);
@@ -249,10 +261,21 @@ void drawDifficultyInfo() {
     display.setTextSize(2);
     display.setCursor(10, 35);
     
-    if(robotDifficulty == 0)      display.print("LATWY");
-    else if(robotDifficulty == 1) display.print("SREDNI");
-    else if(robotDifficulty == 2) display.print("TRUDNY");
-    else                          display.print(robotDifficulty);
+    switch (robotDifficulty)
+    {
+    case 0:
+        display.print("LATWY");
+        break;
+    case 1:
+        display.print("SREDNI");
+        break;
+    case 2:
+        display.print("TRUDNY");
+        break;  
+    default:
+        display.print(robotDifficulty);
+        break;
+    }
 
     display.setTextSize(1);
     display.setCursor(0, 54);
@@ -298,14 +321,20 @@ void actionOk() {
                 break;
         }
     }else if (currentState == DIFFICULTY_INFO) {
-        // --- ZMIANA TRUDNOŚCI ---
-        // 1. Zwiększ lokalnie (tymczasowo)
+        // 1. Obliczamy następny poziom
         int nextDiff = robotDifficulty + 1;
         if (nextDiff > 2) nextDiff = 0;
         
-        // 2. Wyślij do robota
+        // 2. Wysyłamy do robota (żeby wiedział)
         sendHmiMsg("SetDifficulty", nextDiff);
-    }
+
+        // Aktualizujemy zmienną lokalną
+        robotDifficulty = nextDiff; 
+        
+        // Debug
+        Serial.print("Zmieniono lokalnie na: ");
+        Serial.println(robotDifficulty);
+        } 
     else if (currentState == PAUSE) {
         // Wznów grę
         currentState = GAME_RUNNING;
