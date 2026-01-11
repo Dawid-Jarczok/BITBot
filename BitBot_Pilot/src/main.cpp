@@ -35,10 +35,10 @@ AppState previousState = MENU; // Aby wrócić z PAUSE do gry
 
 // Opcje menu
 const char* menuItems[] = {
-    "START GRY",
-    "REKORD",
-    "INFO O GRZE",
-    "POZIOM TRUD.",
+    "START GAME",
+    "BEST SCORE",
+    "GAME INFO",
+    "DIFFICULTY LEVEL",
 };
 int menuLength = 4;
 int selectedOption = 0;
@@ -168,30 +168,30 @@ void drawMenu() {
 }
 
 void drawGame() {
-    display.setTextSize(2);
+    display.setTextSize(1.4);
     display.setTextColor(SSD1306_WHITE);
     display.setCursor(10, 5);
-    display.println(F("GRA TRWA"));
+    display.println(F("GAME RUNNING"));
     
     display.setTextSize(1);
     uint32_t elapsedTime = (millis() - gameStartTime) / 1000;
     display.setCursor(10, 25);
-    display.print("Czas: ");
+    display.print("Time: ");
     display.print(elapsedTime);
     display.println(" s");
 
     display.setCursor(10, 35);
-    display.print("Poziom: ");
+    display.print("Level: ");
         switch (robotDifficulty)
     {
     case 0:
-        display.print("LATWY");
+        display.print("Easy");
         break;
     case 1:
-        display.print("SREDNI");
+        display.print("Medium");
         break;
     case 2:
-        display.print("TRUDNY");
+        display.print("Hard");
         break;  
     default:
         display.print(robotDifficulty);
@@ -208,7 +208,7 @@ void drawInfo() {
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
     display.setCursor(0, 0);
-    display.println(F("--- INFO O GRZE ---"));
+    display.println(F("--- GAME INFO ---"));
     display.drawLine(0, 10, 128, 10, SSD1306_WHITE);
 
     display.setCursor(0, 15);
@@ -216,47 +216,47 @@ void drawInfo() {
     display.println(F("Hackathon Build"));
     display.println(F("Team: Wymiatacze"));
     display.println();
-    display.println(F("Nacisnij BACK *"));
-    display.println(F("aby wrocic do menu"));
+    display.println(F("Press BACK *"));
+    display.println(F("to return to menu"));
 }
 
 void drawRecord() {
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
     display.setCursor(0, 0);
-    display.println(F("--- REKORD ---"));
+    display.println(F("--- RECORD ---"));
     display.drawLine(0, 10, 128, 10, SSD1306_WHITE);
     display.setCursor(0, 20);
-    display.println(F("Najlepszy wynik:"));
+    display.println(F("Best score:"));
     display.setTextSize(2);
     display.setCursor(20, 35);
     display.println(maxScore);
     display.setTextSize(1);
     display.setCursor(0, 54);
-    display.println(F("BACK: wrocic do menu"));
+    display.println(F("BACK: return to menu"));
 }
 
 void drawPause() {
     display.setTextSize(1.5);
     display.setTextColor(SSD1306_WHITE);
     display.setCursor(20, 15);
-    display.println(F("Czy na Pewno"));
-    display.println(F("chcesz przerwac"));
+    display.println(F("Are you sure"));
+    display.println(F("you want to quit?"));
     display.setTextSize(1);
     display.drawLine(0, 35, 128, 35, SSD1306_WHITE);
     display.setCursor(0, 45);
-    display.println(F("#: Nie *: Tak"));
+    display.println(F("#: No *: Yes"));
 }
 
 void drawDifficultyInfo() {
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
     display.setCursor(0, 0);
-    display.println(F("-- POZIOM TRUDNOSCI --"));
+    display.println(F("-- DIFFICULTY LEVEL --"));
     display.drawLine(0, 10, 128, 10, SSD1306_WHITE);
     
     display.setCursor(0, 20);
-    display.println(F("Aktualny poziom:"));
+    display.println(F("Current level:"));
     
     // Duży, ładny napis poziomu
     display.setTextSize(2);
@@ -265,13 +265,13 @@ void drawDifficultyInfo() {
     switch (robotDifficulty)
     {
     case 0:
-        display.print("LATWY");
+        display.print("EASY");
         break;
     case 1:
-        display.print("SREDNI");
+        display.print("MEDIUM");
         break;
     case 2:
-        display.print("TRUDNY");
+        display.print("HARD");
         break;  
     default:
         display.print(robotDifficulty);
@@ -280,7 +280,7 @@ void drawDifficultyInfo() {
 
     display.setTextSize(1);
     display.setCursor(0, 54);
-    display.println(F("#: ZMIEN   *: WROC"));
+    display.println(F("#: CHANGE   *: BACK"));
 }
 
 
