@@ -7,12 +7,11 @@
 
 class Game {
 public:
-    Game(Target *target, Pointer *pointer, Preferences *prefs) : _target(target), _pointer(pointer), _prefs(prefs) {};
+    Game(Target *target, Target *antyTarget, Pointer *pointer, Preferences *prefs) : _target(target), _antyTarget(antyTarget), _pointer(pointer), _prefs(prefs) {};
 
     void begin();
     void setLedPin(uint8_t pin);
     void iterate();
-    void updatePositions(float pointerX, float pointerY, float targetX, float targetY);
     void start();
     void stop();
 
@@ -20,12 +19,14 @@ public:
     void setUpdateInterval(uint16_t intervalMs) { _updateInterval = intervalMs; }
     void setGameDuration(uint32_t durationMs) { _gameDuration = durationMs; }
     inline void setMaxScore(float maxScore) { _maxScore = maxScore; }
+    inline void setAntyTargetMode(bool enable) { _antyTargetMode = enable; }
 
     inline float getScore() { return _score; }
     inline float getMaxScore() { return _maxScore; }
     inline uint32_t getGameTime() { return _gameTime; }
     inline bool isTargetInPointer() { return _isTargetInPointer; }
     inline bool isRunning() { return _isRunning; }
+    inline bool getAntyTargetMode() { return _antyTargetMode; }
     uint32_t getGameTimeLeft();
 
     void setMode(uint8_t mode);
@@ -33,6 +34,7 @@ public:
 
 private:
     bool _isRunning = false;
+    bool _antyTargetMode = false;
     float _score = 0.0f;
     float _maxScore = 0.0f;
     uint32_t _gameStartTime = 0;
@@ -45,12 +47,15 @@ private:
 
     float _targetX = 0.0f;
     float _targetY = 0.0f;
+    float _antyTargetX = 0.0f;
+    float _antyTargetY = 0.0f;
     float _pointerX = 0.0f;
     float _pointerY = 0.0f;
     float _pointerRadius = 0.75f;
     bool _isTargetInPointer = false;
 
     Target *_target = nullptr;
+    Target *_antyTarget = nullptr;
     Pointer *_pointer = nullptr;
     Preferences *_prefs = nullptr;
 
