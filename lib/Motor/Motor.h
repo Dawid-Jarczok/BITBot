@@ -37,7 +37,7 @@ private:
     volatile uint8_t _encLastState = 0b00;
 
     float _enc_err_thr = 0.0;
-    float Kp = 500.0f;
+    float Kp = 40.0f;
     float Ki = 0.0f;
     float Kd = 0.0f;
     float input = 0.0f, output = 0.0f, setpoint = 0.0f;

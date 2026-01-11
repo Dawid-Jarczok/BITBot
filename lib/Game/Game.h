@@ -9,6 +9,7 @@ public:
     Game(Target *target, Pointer *pointer) : _target(target), _pointer(pointer) {};
 
     void begin();
+    void setLedPin(uint8_t pin);
     void iterate();
     void updatePositions(float pointerX, float pointerY, float targetX, float targetY);
     void start();
@@ -26,6 +27,7 @@ public:
     uint32_t getGameTimeLeft();
 
     void setMode(uint8_t mode);
+    inline uint8_t getMode() { return _mode; }
 
 private:
     bool _isRunning = false;
@@ -37,24 +39,26 @@ private:
 
     uint16_t _updateInterval = 10;
 
+    uint8_t _ledPin = -1;
+
     float _targetX = 0.0f;
     float _targetY = 0.0f;
     float _pointerX = 0.0f;
     float _pointerY = 0.0f;
-    float _pointerRadius = 0.5f;
+    float _pointerRadius = 0.75f;
     bool _isTargetInPointer = false;
 
     Target *_target = nullptr;
     Pointer *_pointer = nullptr;
 
     uint8_t _mode = 0;
-    const float _modeTargetMinVelocity[3] = {0.5f, 1.0f, 2.0f};
-    const float _modeTargetMaxVelocity[3] = {1.0f, 3.0f, 5.0f};
+    const float _modeTargetMinVelocity[3] = {0.5f, 1.5f, 3.0f};
+    const float _modeTargetMaxVelocity[3] = {1.0f, 4.0f, 9.0f};
     const float _modeTargetMinAcceleration[3] = {1.0f, 1.5f, 2.0f};
-    const float _modeTargetMaxAcceleration[3] = {1.5f, 2.0f, 4.0f};
+    const float _modeTargetMaxAcceleration[3] = {1.5f, 3.0f, 6.0f};
 
-    const float _modePointerMaxVelocity[3] = {2.0f, 4.0f, 6.0f};
-    const float _modePointerAcceleration[3] = {2.0f, 3.0f, 5.0f};
+    const float _modePointerMaxVelocity[3] = {2.0f, 5.0f, 10.0f};
+    const float _modePointerAcceleration[3] = {2.0f, 5.0f, 8.0f};
 
     float _TargetVelocityUp = 0.1f;
     float _TargetAccelerationUp = 0.1f;

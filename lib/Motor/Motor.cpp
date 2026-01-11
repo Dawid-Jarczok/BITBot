@@ -57,7 +57,7 @@ float Motor::getPositionRev() {
 
 float Motor::getPositionMM() {
     float posRev = getPositionRev();
-    float posRack = posRev * PI;
+    float posRack = posRev * PI * 20.0f;
     return posRack;
 }
 
@@ -76,21 +76,18 @@ void Motor::updatePosition() {
 }
 
 void Motor::iterate() {
-    static uint32_t lastTime = 0;
-    if (millis() - lastTime < 10) return;
-    lastTime = millis();
     if (_pidEnabled) {
         input = getPositionMM();
-        if (abs(setpoint - input) < 0.001f) {
+        if (abs(setpoint - input) < 0.002f) {
             stop();
             output = 0.0f;
         } else {
-            pid.Compute();
+            if (!pid.Compute()) return;
             if (output == 0.0f) stop();
             else {
                 bool dir = output > 0;
                 uint16_t pwm = (uint16_t)abs(output);
-                pwm = map(pwm, 0, 255, 40, 255); // Ensure minimum PWM
+                pwm = map(pwm, 0, 255, 20, 255); // Ensure minimum PWM
                 if (dir) setSpeed(pwm);
                 else setSpeed(-pwm);
             }
