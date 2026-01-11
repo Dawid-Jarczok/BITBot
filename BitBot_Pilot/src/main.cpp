@@ -201,7 +201,7 @@ void drawGame() {
     
     display.drawLine(0, 48, 128, 48, SSD1306_WHITE);
     display.setCursor(0, 54);
-    display.println(F("* :PAUSE/BACK"));
+    display.println(F("* : menu"));
 }
 
 void drawInfo() {
@@ -237,14 +237,15 @@ void drawRecord() {
 }
 
 void drawPause() {
-    display.setTextSize(2);
+    display.setTextSize(1.5);
     display.setTextColor(SSD1306_WHITE);
-    display.setCursor(25, 15);
-    display.println(F("PAUZA"));
+    display.setCursor(20, 15);
+    display.println(F("Czy na Pewno"));
+    display.println(F("chcesz przerwac"));
     display.setTextSize(1);
     display.drawLine(0, 35, 128, 35, SSD1306_WHITE);
     display.setCursor(0, 45);
-    display.println(F("#: wznow  *: menu"));
+    display.println(F("#: Nie *: Tak"));
 }
 
 void drawDifficultyInfo() {

@@ -1,32 +1,14 @@
 #pragma once 
 
-#define JOYSTICK_X_PIN  13
-#define JOYSTICK_Y_PIN  12
+#define SCL_PIN 5
+#define SDA_PIN 4
 
-#define LED_MATRIX_PIN  21
-
-#define MOTOR_PIN_X1     19
-#define MOTOR_PIN_X2     18
-#define MOTOR_PIN_PWM_X  5
-#define MOTOR_PIN_Y1     -1
-#define MOTOR_PIN_Y2     -1
-#define MOTOR_PIN_PWM_Y  -1
-
-#define MOTOR_ENCODER_X_PIN_A  22
-#define MOTOR_ENCODER_X_PIN_B  23
-
-#define MOTOR_ENCODER_Y_PIN_A  -1
-#define MOTOR_ENCODER_Y_PIN_B  -1
-
-#define SCL_PIN 26
-#define SDA_PIN 25
-
-#define PIN_UP  5   
-#define PIN_DOWN 18
+#define PIN_UP   22  
+#define PIN_DOWN 21
 #define PIN_OK    19  
-#define PIN_BACK  21  
+#define PIN_BACK  18  
 
-#define PILOT_RX_PIN 16 
-#define PILOT_TX_PIN 17
+#define PILOT_RX_PIN 13
+#define PILOT_TX_PIN 12
 
 
