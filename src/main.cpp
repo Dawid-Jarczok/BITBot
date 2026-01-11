@@ -22,7 +22,8 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_MATRIX_PIN, NEO_GRB + NEO_KHZ800);
 Joystick joystick(JOYSTICK_X_PIN, JOYSTICK_Y_PIN);
 Pointer pointer(&joystick, 16, 16);
 Target target(16, 16);
-Game game(&target, &pointer, &prefs);
+Target antyTarget(16, 16);
+Game game(&target, &antyTarget, &pointer, &prefs);
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 UARTCommandParser hmi(Serial1);
 
@@ -80,6 +81,9 @@ void setup() {
     target.begin();
     target.setUpdateInterval(10);
 
+    antyTarget.begin();
+    antyTarget.setUpdateInterval(10);
+
     game.begin();
     game.setLedPin(TARGET_LED_PIN);
     game.setMode(0);
@@ -113,6 +117,7 @@ void setup() {
     display.display();
 
     sendHmiInit();
+    game.setAntyTargetMode(false);
 }
 
 void loop() {
@@ -120,8 +125,8 @@ void loop() {
     motorY.iterate();
     pointer.iterate();
     target.iterate();
+    antyTarget.iterate();
 
-    game.updatePositions(pointer.getX(), pointer.getY(), target.getX(), target.getY());
     game.iterate();
 
     if (game.isRunning()) {
@@ -142,19 +147,26 @@ void loop() {
         hmi.iterate();
         sendHmiUpdate();
 
-        Serial.printf("dM X: %.2f\tdM Y: %.2f\tPointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\t Game Score: %.2f\ttime: %dms\t%.2f %.2f\n", 
-            motorX.getPositionMM() / 8.0f,
-            motorY.getPositionMM() / 8.0f,
-            pointer.getX(), pointer.getXVelocity(),
-            pointer.getY(), pointer.getYVelocity(),
-            pointer.getXInt(), pointer.getYInt(),
-            game.getScore(), game.getGameTime(),
-            target.getMaxVelocity(), target.getAcceleration());
+        // Serial.printf("X: %.2f (%.2f)\tY: %.2f (%.2f)\tAnty: %d\n", 
+        //     antyTarget.getX(), antyTarget.getYVelocity(),
+        //     antyTarget.getY(), antyTarget.getYVelocity(),
+        //     game.getAntyTargetMode() ? 1 : 0);
+           
+
+        // Serial.printf("dM X: %.2f\tdM Y: %.2f\tPointer X: %.2f (%.2f)\tY: %.2f (%.2f)\tx:%d y:%d\t Game Score: %.2f\ttime: %dms\t%.2f %.2f\n", 
+        //     motorX.getPositionMM() / 8.0f,
+        //     motorY.getPositionMM() / 8.0f,
+        //     pointer.getX(), pointer.getXVelocity(),
+        //     pointer.getY(), pointer.getYVelocity(),
+        //     pointer.getXInt(), pointer.getYInt(),
+        //     game.getScore(), game.getGameTime(),
+        //     target.getMaxVelocity(), target.getAcceleration());
 
         strip.clear();
         setMatrixLed(pointer.getXInt(), pointer.getYInt(), strip.Color(0, 50, 0));
         if (game.isRunning()) {
-            setMatrixLed(target.getXInt(), target.getYInt(), strip.Color(50, 0, 0));
+            setMatrixLed(target.getXInt(), target.getYInt(), strip.Color(0, 0, 50));
+            if (game.getAntyTargetMode()) setMatrixLed(antyTarget.getXInt(), antyTarget.getYInt(), strip.Color(50, 0, 0));
         }
         strip.show();
 

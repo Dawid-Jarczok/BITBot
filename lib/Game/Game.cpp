@@ -17,6 +17,12 @@ void Game::iterate() {
     static uint32_t lastUpdate = 0;
     if (millis() - lastUpdate < _updateInterval) return;
     lastUpdate = millis();
+    _pointerX = _pointer->getX();
+    _pointerY = _pointer->getY();
+    _targetX = _target->getX();
+    _targetY = _target->getY();
+    _antyTargetX = _antyTarget->getX();
+    _antyTargetY = _antyTarget->getY();
     if (!_isRunning) {
         digitalWrite(_ledPin, LOW);
         return;
@@ -33,9 +39,15 @@ void Game::iterate() {
         float newTargetAcc = _target->getAcceleration() + _TargetAccelerationUp;
         newTargetAcc = constrain(newTargetAcc, _modeTargetMinAcceleration[_mode], _modeTargetMaxAcceleration[_mode]);
         _target->setAcceleration(newTargetAcc);
+
+        if (_antyTargetMode) {
+            _antyTarget->setMaxVelocity(newTargetMaxV);
+            _antyTarget->setAcceleration(newTargetAcc);
+        }
     }
 
     float intervalSec = (float)_updateInterval / 1000.0f;
+    // Check if target is within pointer radius
     if (_pointerX - _pointerRadius <= _targetX &&
         _pointerX + _pointerRadius >= _targetX &&
         _pointerY - _pointerRadius <= _targetY &&
@@ -47,17 +59,20 @@ void Game::iterate() {
         _isTargetInPointer = false;
         digitalWrite(_ledPin, LOW);
     }
+
+    // Check if anty-target is within pointer radius
+    if (_antyTargetMode) {
+        if (_pointerX - _pointerRadius <= _antyTargetX &&
+        _pointerX + _pointerRadius >= _antyTargetX &&
+        _pointerY - _pointerRadius <= _antyTargetY &&
+        _pointerY + _pointerRadius >= _antyTargetY) {
+            _score -= (float)_gameTime * 0.02f * intervalSec * pow(1.0f + (float)_mode, 2);
+        }
+    }
     
     if (_gameTime >= _gameDuration) {
         stop();
     }
-}
-
-void Game::updatePositions(float pointerX, float pointerY, float targetX, float targetY) {
-    _pointerX = pointerX;
-    _pointerY = pointerY;
-    _targetX = targetX;
-    _targetY = targetY;
 }
 
 void Game::start() {
@@ -73,10 +88,19 @@ void Game::start() {
     _target->setMaxVelocity(_modeTargetMinVelocity[_mode]);
     _target->setAcceleration(_modeTargetMinAcceleration[_mode]);
     _target->start();
+    if (_antyTargetMode) {
+        _antyTarget->reset();
+        _antyTarget->setMaxVelocity(_modeTargetMinVelocity[_mode]);
+        _antyTarget->setAcceleration(_modeTargetMinAcceleration[_mode]);
+        _antyTarget->start();
+    } else {
+        _antyTarget->stop();
+    }
 }
 
 void Game::stop() {
     _target->stop();
+    _antyTarget->stop();
     _isRunning = false;
 
     if (_maxScore < _score) {
