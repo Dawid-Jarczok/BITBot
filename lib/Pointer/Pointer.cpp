@@ -10,7 +10,7 @@ void Pointer::iterate() {
 
     float intervalSec = (float)_updateInterval / 1000.0f;
     _xVel += _joystick->readX() * _acceleration * intervalSec;
-    _yVel += _joystick->readY() * _acceleration * intervalSec;
+    _yVel += -_joystick->readY() * _acceleration * intervalSec;
     _xVel = constrain(_xVel, -_maxVelocity, _maxVelocity);
     _yVel = constrain(_yVel, -_maxVelocity, _maxVelocity);
 
@@ -31,4 +31,11 @@ void Pointer::iterate() {
         _y = (float)_maxY-0.01f;
         _yVel = 0.0f;
     }
+}
+
+void Pointer::resetPosition() {
+    _x = 0.0f;
+    _y = 0.0f;
+    _xVel = 0.0f;
+    _yVel = 0.0f;
 }

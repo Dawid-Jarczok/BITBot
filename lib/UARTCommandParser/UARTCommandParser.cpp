@@ -64,7 +64,6 @@ void UARTCommandParser::iterate() {
             memset(_buf, 0, sizeof(_buf));
         }
     }
-    vTaskDelay(5 / portTICK_PERIOD_MS);
 }
 
 void UARTCommandParser::_trim_span(const char *start, size_t len, const char **out_start, size_t *out_len) {

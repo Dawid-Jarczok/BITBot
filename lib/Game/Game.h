@@ -52,13 +52,13 @@ private:
     Pointer *_pointer = nullptr;
 
     uint8_t _mode = 0;
-    const float _modeTargetMinVelocity[3] = {0.5f, 1.0f, 2.0f};
-    const float _modeTargetMaxVelocity[3] = {1.0f, 3.0f, 5.0f};
+    const float _modeTargetMinVelocity[3] = {0.5f, 1.5f, 3.0f};
+    const float _modeTargetMaxVelocity[3] = {1.0f, 4.0f, 9.0f};
     const float _modeTargetMinAcceleration[3] = {1.0f, 1.5f, 2.0f};
-    const float _modeTargetMaxAcceleration[3] = {1.5f, 2.0f, 4.0f};
+    const float _modeTargetMaxAcceleration[3] = {1.5f, 3.0f, 6.0f};
 
-    const float _modePointerMaxVelocity[3] = {2.0f, 4.0f, 6.0f};
-    const float _modePointerAcceleration[3] = {2.0f, 3.0f, 5.0f};
+    const float _modePointerMaxVelocity[3] = {2.0f, 5.0f, 10.0f};
+    const float _modePointerAcceleration[3] = {2.0f, 5.0f, 8.0f};
 
     float _TargetVelocityUp = 0.1f;
     float _TargetAccelerationUp = 0.1f;

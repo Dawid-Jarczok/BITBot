@@ -40,7 +40,7 @@ void Game::iterate() {
         _pointerX + _pointerRadius >= _targetX &&
         _pointerY - _pointerRadius <= _targetY &&
         _pointerY + _pointerRadius >= _targetY) {
-        _score += (float)_gameTime * 0.01f * intervalSec;
+        _score += (float)_gameTime * 0.01f * intervalSec * (1.0f + (float)_mode);
         _isTargetInPointer = true;
         digitalWrite(_ledPin, HIGH);
     } else {
@@ -86,7 +86,7 @@ void Game::stop() {
 
 uint32_t Game::getGameTimeLeft() {
     if (!_isRunning) return 0;
-    return _gameStartTime + _gameDuration - _gameTime;
+    return _gameDuration - _gameTime;
 }
 
 void Game::setMode(uint8_t mode) {

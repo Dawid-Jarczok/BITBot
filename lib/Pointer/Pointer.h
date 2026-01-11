@@ -20,6 +20,7 @@ public:
     inline float getYVelocity() { return _yVel; }
     inline float getMaxVelocity() { return _maxVelocity; }
     inline float getAcceleration() { return _acceleration; }
+    void resetPosition();
     void iterate();
 
 private:

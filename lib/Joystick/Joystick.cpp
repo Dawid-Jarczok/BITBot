@@ -40,7 +40,7 @@ float Joystick::normalizeX(int raw) {
     valueNormalized = (value * 10) / _midX;
   }
 
-    if (valueNormalized < 0.05 && valueNormalized > -0.05) {
+    if (valueNormalized < 0.1 && valueNormalized > -0.1) {
       valueNormalized = 0;
     }
     return valueNormalized;
@@ -63,7 +63,7 @@ float Joystick::normalizeY(int raw) {
     valueNormalized = (value * 10) / _midY;
   }
 
-  if (valueNormalized < 0.05 && valueNormalized > -0.05) {
+  if (valueNormalized < 0.2 && valueNormalized > -0.2) {
       valueNormalized = 0;
     }
     return valueNormalized;
