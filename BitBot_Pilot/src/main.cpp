@@ -52,10 +52,6 @@ const char* menuItems[] = {
 int menuLength = 4;
 int selectedOption = 0;
 
-// Zmienne lokalne
-uint32_t gameStartTime = 0;
-uint32_t maxScore = 0;
-
 // --- ZMIENNE GRY ---
 uint32_t gameStartTime = 0;
 uint32_t gameScore = 0;
@@ -355,10 +351,6 @@ void initGame() {
 void stopGame() {
     sendHmiMsg("StopGame", 1); 
     Serial.println("Gra: Wyslalem STOP");
-}
-
-void sendHmiMsg(const char* msg, int32_t value) {
-    Serial1.printf("%s=%d\n", msg, value);
 }
 
 void setupHmiHandlers() {
